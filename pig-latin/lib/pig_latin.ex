@@ -1,4 +1,8 @@
 defmodule PigLatin do
+  @vowels "aoeui"
+  @vowels_at_start ~r/^([#{@vowels}]|[xy][^#{@vowels}])/
+  @consonants ~r/^([^#{@vowels}]*qu|[^#{@vowels}]+)/
+
   @doc """
   Given a `phrase`, translate it a word at a time to Pig Latin.
 
@@ -22,16 +26,19 @@ defmodule PigLatin do
   end
 
   defp translate_word(word) do
-    index =
-      cond do
-        String.starts_with?(word, ~w(a e i o u xr yt xb)) -> 0
-        String.starts_with?(word, ~w(sch squ thr)) -> 3
-        String.starts_with?(word, ~w(th ch qu)) -> 2
-        true -> 1
-      end
+    if starts_with_vowel?(word) do
+      word <> "ay"
+    else
+      with {consonants, rest} <- partition_consonants(word),
+           do: rest <> consonants <> "ay"
+    end
+  end
 
-    {first, second} = String.split_at(word, index)
+  defp starts_with_vowel?(word), do: String.match?(word, @vowels_at_start)
 
-    "#{second}#{first}ay"
+  defp partition_consonants(word) do
+    word
+    |> String.split(@consonants, include_captures: true, trim: true)
+    |> List.to_tuple()
   end
 end
