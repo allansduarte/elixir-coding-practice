@@ -24,29 +24,8 @@ defmodule ProteinTranslation do
   """
   @spec of_rna(String.t()) :: {atom, list(String.t())}
   def of_rna(rna) do
-    list =
-      rna
-      |> String.graphemes()
-      |> Enum.chunk_every(3)
-
-    proteins =
-      for x <- list do
-        codon = Enum.join(x)
-
-        tuple =
-          case of_codon(codon) do
-            {:error, _} -> {:error, "invalid RNA"}
-            {:ok, "STOP"} -> {:ok, "STOP"}
-            {:ok, protein} -> {:ok, protein}
-          end
-
-        {_, protein} = tuple
-
-        protein
-      end
-
-      Enum.uniq(proteins)
-      |> Enum.reject(fn x -> x == "STOP" end)
+    # codons = for <<codon::binary-3 <- rna>>, do: codon
+    do_of_rna(rna, [])
   end
 
   @doc """
@@ -76,5 +55,17 @@ defmodule ProteinTranslation do
       :error -> {:error, "invalid codon"}
       {:ok, _} = value -> value
     end
+  end
+
+  defp do_of_rna(<<codon::binary-size(3), rest::binary>>, list_protein) do
+    case of_codon(codon) do
+      {:error, _} -> {:error, "invalid RNA"}
+      {:ok, "STOP"} -> {:ok, list_protein}
+      {:ok, protein} -> do_of_rna(rest, list_protein ++ [protein])
+    end
+  end
+
+  defp do_of_rna("", proteins) do
+    {:ok, proteins}
   end
 end
