@@ -2,7 +2,7 @@
 My Elixir learning path solving exercism.io problems and other projects.
 
 ## Exercism
-9/94 Elixir fundamentals exercise completed
+11/94 Elixir fundamentals exercise completed
 
 ## Other projects folder
 
