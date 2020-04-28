@@ -1,5 +1,9 @@
 use Mix.Config
 
+wolfram_app_id = "EKR94V-3KR2T2R246"
+
+config :info_sys, :wolfram, app_id: wolfram_app_id
+
 # Configure your database
 config :rumbl, Rumbl.Repo,
   username: "postgres",
