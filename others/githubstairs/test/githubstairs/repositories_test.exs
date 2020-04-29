@@ -1,7 +1,6 @@
 defmodule Githubstairs.RepositoriesTest do
   use Githubstairs.DataCase, async: true
 
-  alias Githubstairs.Repo
   alias Githubstairs.Repositories
 
   doctest Githubstairs.Repositories
