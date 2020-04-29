@@ -10,19 +10,11 @@ defmodule GithubstairsWeb.RepositoryView do
   end
 
   def render("repository.json", %{repository: repository}) when is_map(repository) do
-    %{
-      id: repository.id,
-      github_repository_id: repository.github_repository_id,
-      name: repository.name,
-      description: repository.description,
-      url: repository.url,
-      language: repository.language,
-      tags:
-        if(Ecto.assoc_loaded?(repository.tags),
-          do: render_many(repository.tags, __MODULE__, "tags.json", as: :tags),
-          else: []
-        )
-    }
+    if Kernel.map_size(repository) > 0 do
+      do_render_repository(repository)
+    else
+      %{}
+    end
   end
 
   def render("repository.json", %{repository: repository_tuple})
@@ -48,6 +40,22 @@ defmodule GithubstairsWeb.RepositoryView do
     %{
       id: tags.id,
       name: tags.name
+    }
+  end
+
+  defp do_render_repository(repository) do
+    %{
+      id: repository.id,
+      github_repository_id: repository.github_repository_id,
+      name: repository.name,
+      description: repository.description,
+      url: repository.url,
+      language: repository.language,
+      tags:
+        if(Ecto.assoc_loaded?(repository.tags),
+          do: render_many(repository.tags, __MODULE__, "tags.json", as: :tags),
+          else: []
+        )
     }
   end
 end
