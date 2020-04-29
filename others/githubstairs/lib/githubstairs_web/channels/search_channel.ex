@@ -9,28 +9,37 @@ defmodule GithubstairsWeb.SearchChannel do
   end
 
   def handle_in("new_search", %{"query" => search_term}, socket) do
-    repositories =
-      Repositories.search(search_term)
-      |> Repo.all()
-
-    cond do
-      length(repositories) > 0 ->
-        broadcast!(socket, "new_search", %{
-          repositories:
-            GithubstairsWeb.RepositoryView.render("index.json", repositories: repositories)
-        })
+    case length(get_repositories(search_term)) > 0 do
+      true ->
+        broadcast_search(socket, repositories)
 
         {:reply, :ok, socket}
 
-      true ->
-        IO.inspect("erro na busca")
-        {:noreply, socket}
-        # {:reply, {:error, %{errors: changeset}}, socket}
+      false ->
+        broadcast_search(socket, %{})
+
+        {:reply, {:error, :not_found, socket}
     end
   end
 
   def handle_in("new_search", _, socket) do
-    IO.inspect("matched")
     {:noreply, socket}
+  end
+
+  defp broadcast_search(socket, payload) do
+    broadcast!(socket, "new_search", %{
+      repositories: GithubstairsWeb.RepositoryView.render("index.json", repositories: payload)
+    })
+  end
+
+  defp get_repositories(search_term) do
+    case String.length(search_term) > 0 do
+      true ->
+        Repositories.search(search_term)
+        |> Repo.all()
+
+      false ->
+        Repositories.list()
+    end
   end
 end
