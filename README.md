@@ -1,8 +1,8 @@
-# My Elixir Learning Path
-My Elixir learning path solving exercism.io problems and other projects.
+# This is my repository for Elixir coding practice
+I work on exercises from several different sources, incluing:
 
 ## Exercism
-11/94 Elixir fundamentals exercise completed
+12/94 Elixir fundamentals exercise completed
 
 ## Other projects folder
 
