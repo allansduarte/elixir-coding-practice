@@ -9,7 +9,8 @@ defmodule GithubstairsWeb.SearchChannel do
   end
 
   def handle_in("new_search", %{"query" => search_term}, socket) do
-    case length(get_repositories(search_term)) > 0 do
+    repositories = get_repositories(search_term)
+    case length(repositories) > 0 do
       true ->
         broadcast_search(socket, repositories)
 
@@ -18,13 +19,13 @@ defmodule GithubstairsWeb.SearchChannel do
       false ->
         broadcast_search(socket, %{})
 
-        {:reply, {:error, :not_found, socket}
+        {:reply, {:error, :not_found, socket}}
     end
   end
 
-  def handle_in("new_search", _, socket) do
-    {:noreply, socket}
-  end
+  # def handle_in("new_search", _, socket) do
+  #   {:noreply, socket}
+  # end
 
   defp broadcast_search(socket, payload) do
     broadcast!(socket, "new_search", %{
