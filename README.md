@@ -2,7 +2,7 @@
 I work on exercises from several different sources, incluing:
 
 ## Exercism
-31/94 Elixir fundamentals exercise completed
+37/94 Elixir fundamentals exercise completed
 
 ## Other projects folder
 
