@@ -2,9 +2,12 @@
 I work on exercises from several different sources, incluing:
 
 ## Exercism
-37/94 Elixir fundamentals exercise completed
+38/94 Elixir fundamentals exercise completed
 
 ## Other projects folder
+
+### Discuss
+Simple CRUD Elixir/Phoenix project to simulate a forum.
 
 ### Identicon
 A service to generate a unique image with a piece of full name information like Github identicon. This project was crafted just in Elixir and some pure Erlang code.
