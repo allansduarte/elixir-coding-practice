@@ -2,4 +2,4 @@
 I work on exercises from several different sources, incluing:
 
 ## Exercism
-41/94 Elixir fundamentals exercise completed
+51/94 Elixir fundamentals exercise completed
