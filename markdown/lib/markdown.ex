@@ -14,83 +14,37 @@ defmodule Markdown do
   def parse(input) do
     input
     |> String.split("\n")
-    |> Enum.map(&process/1)
-    |> Enum.join()
+    |> Enum.map_join(&process_lines/1)
+    |> process_tags()
     |> enclose_with_list_tag()
   end
 
-  def process(row) do
-    case String.first(row) do
-      "#" ->
-        row
-        |> parse_header_md_level()
-        |> enclose_with_header_tag()
+  defp process_lines("#" <> str), do: parse_header(str, 1)
 
-      "*" ->
-        row
-        |> parse_list_item_md_level()
-        |> enclose_with_list_item_tag()
+  defp process_lines("*" <> str), do: "<li>#{String.trim(str)}</li>"
 
-      _ ->
-        row
-        |> String.split()
-        |> enclose_with_paragraph_tag()
-    end
+  defp process_lines(str), do: "<p>#{str}</p>"
+
+  defp parse_header(" " <> str, h_level), do: "<h#{h_level}>#{String.trim(str)}</h#{h_level}>"
+  defp parse_header("#" <> str, h_level), do: parse_header(str, h_level + 1)
+
+  defp process_tags(str) do
+    str
+    |> parse_bold_tags()
+    |> parse_italic_tags()
   end
 
-  defp parse_header_md_level(header) do
-    [markdown | text] = String.split(header)
-    {to_string(String.length(markdown)), Enum.join(text, " ")}
+  defp parse_bold_tags(str), do: String.replace(str, ~r/__([^_]+)__/, "<strong>\\1</strong>")
+
+  defp parse_italic_tags(str), do: String.replace(str, ~r/_([^_]+)_/, "<em>\\1</em>")
+
+  defp enclose_with_list_tag(str) do
+    str
+    |> close_initial_list_tag()
+    |> close_end_list_tag()
   end
 
-  defp enclose_with_list_item_tag(list), do: "<li>" <> parse_list_item_md_level(list) <> "</li>"
+  defp close_initial_list_tag(str), do: String.replace(str, "<li>", "<ul><li>", global: false)
 
-  defp parse_list_item_md_level(list) do
-    list
-    |> String.trim_leading("* ")
-    |> String.split()
-    |> join_words_with_tags()
-  end
-
-  defp enclose_with_header_tag({heading_level, heading_text}) do
-    "<h" <> heading_level <> ">" <> heading_text <> "</h" <> heading_level <> ">"
-  end
-
-  defp enclose_with_paragraph_tag(tags) do
-    "<p>#{join_words_with_tags(tags)}</p>"
-  end
-
-  defp join_words_with_tags(tags) do
-    Enum.join(Enum.map(tags, &replace_md_with_tag/1), " ")
-  end
-
-  defp replace_md_with_tag(tag) do
-    tag
-    |> replace_prefix_md()
-    |> replace_suffix_md()
-  end
-
-  defp replace_prefix_md(tag) do
-    cond do
-      tag =~ ~r/^#{"__"}{1}/ -> String.replace(tag, ~r/^#{"__"}{1}/, "<strong>", global: false)
-      tag =~ ~r/^[#{"_"}{1}][^#{"_"}+]/ -> String.replace(tag, ~r/_/, "<em>", global: false)
-      true -> tag
-    end
-  end
-
-  defp replace_suffix_md(tag) do
-    cond do
-      tag =~ ~r/#{"__"}{1}$/ -> String.replace(tag, ~r/#{"__"}{1}$/, "</strong>")
-      tag =~ ~r/[^#{"_"}{1}]/ -> String.replace(tag, ~r/_/, "</em>")
-      true -> tag
-    end
-  end
-
-  defp enclose_with_list_tag(list) do
-    String.replace_suffix(
-      String.replace(list, "<li>", "<ul>" <> "<li>", global: false),
-      "</li>",
-      "</li>" <> "</ul>"
-    )
-  end
+  defp close_end_list_tag(str), do: String.replace_suffix(str, "</li>", "</li></ul>")
 end
