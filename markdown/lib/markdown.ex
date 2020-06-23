@@ -1,4 +1,7 @@
 defmodule Markdown do
+  @bold_tags ~r/__([^_]+)__/
+  @italic_tags ~r/_([^_]+)_/
+
   @doc """
     Parses a given string with Markdown syntax and returns the associated HTML for that string.
 
@@ -34,9 +37,9 @@ defmodule Markdown do
     |> parse_italic_tags()
   end
 
-  defp parse_bold_tags(str), do: String.replace(str, ~r/__([^_]+)__/, "<strong>\\1</strong>")
+  defp parse_bold_tags(str), do: String.replace(str, @bold_tags, "<strong>\\1</strong>")
 
-  defp parse_italic_tags(str), do: String.replace(str, ~r/_([^_]+)_/, "<em>\\1</em>")
+  defp parse_italic_tags(str), do: String.replace(str, @italic_tags, "<em>\\1</em>")
 
   defp enclose_with_list_tag(str) do
     str
