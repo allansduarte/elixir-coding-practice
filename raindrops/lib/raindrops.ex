@@ -1,5 +1,5 @@
 defmodule Raindrops do
-  @drops %{3 => "Pling", 5 => "Plang", 7 => "Plong"}
+  @drops [Pling: 3, Plang: 5, Plong: 7]
 
   @doc """
   Returns a string based on raindrop factors.
@@ -12,18 +12,16 @@ defmodule Raindrops do
   """
   @spec convert(pos_integer) :: String.t()
   def convert(number) do
-    number
-    |> is_prime?()
-    |> :maps.filter(@drops)
+    @drops
+    |> parse(number)
     |> do_convert(number)
   end
 
-  defp is_prime?(number) do
-    fn
-      prime_factor, _value -> rem(number, prime_factor) == 0
-    end
-  end
+  defp parse(drops, number), do: Enum.filter(drops, &divisible_factors?(&1, number))
+  defp divisible_factors?({_value, prime_factor}, number), do: rem(number, prime_factor) == 0
 
-  defp do_convert(drops_result, number) when drops_result == %{} , do: "#{number}"
-  defp do_convert(drops_result, _), do: Enum.map_join(drops_result, "", fn {_key, value} -> "#{value}" end)
+  defp do_convert([], number), do: "#{number}"
+
+  defp do_convert(drops_result, _number),
+    do: Enum.map_join(drops_result, "", fn {key, _value} -> "#{key}" end)
 end
