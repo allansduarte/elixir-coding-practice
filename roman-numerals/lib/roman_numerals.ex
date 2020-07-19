@@ -20,20 +20,11 @@ defmodule RomanNumerals do
   """
   @spec numeral(pos_integer) :: String.t()
   def numeral(number) do
-    do_numeral([], number, @numerals)
+    to_roman(number, @numerals)
   end
 
-  defp do_numeral(curr_nums, number, [{letter, digit} | _tail] = num_list) when number >= digit do
-    do_numeral([letter | curr_nums], number - digit, num_list)
-  end
-
-  defp do_numeral(curr_nums, number, [_head | tail]) do
-    do_numeral(curr_nums, number, tail)
-  end
-
-  defp do_numeral(numerals, _number, []) do
-    numerals
-    |> Enum.reverse()
-    |> Enum.map_join("", &to_string/1)
-  end
+  defp to_roman(0, _), do: ""
+  defp to_roman(number, [{letter, digit} | _tail] = num_list) when number >= digit,
+    do: to_string(letter) <> to_roman(number - digit, num_list)
+  defp to_roman(number, [{_letter, digit} | tail]) when number < digit, do: to_roman(number, tail)
 end
