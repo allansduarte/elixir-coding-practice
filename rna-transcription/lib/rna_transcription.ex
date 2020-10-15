@@ -8,18 +8,14 @@ defmodule RnaTranscription do
   'UGAC'
   """
 
-  @rna_map %{
-    ?G => ?C,
-    ?C => ?G,
-    ?T => ?A,
-    ?A => ?U
+  @rna %{
+    ?G => 'C',
+    ?C => 'G',
+    ?T => 'A',
+    ?A => 'U'
   }
   @spec to_rna([char]) :: [char]
   def to_rna(dna) do
-    Enum.map(dna, &translate_to_rna/1)
-  end
-
-  defp translate_to_rna(nucleotide) do
-    Map.fetch!(@rna_map, nucleotide)
+    Enum.reduce(dna, [], fn x, acc -> acc ++ @rna[x] end)
   end
 end
