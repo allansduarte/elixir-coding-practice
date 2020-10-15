@@ -1,5 +1,5 @@
 defmodule BankAccount do
-  alias BankAccount.ProcessTransactions
+  use Agent, restart: :transient
 
   @moduledoc """
   A bank account that supports access from multiple processes.
@@ -15,16 +15,16 @@ defmodule BankAccount do
   """
   @spec open_bank() :: account
   def open_bank() do
-    {:ok, account} = ProcessTransactions.open_account(0)
+    {:ok, account} = Agent.start_link(fn -> 0 end)
     account
   end
 
   @doc """
   Close the bank. Makes the account unavailable.
   """
-  @spec close_bank(account) :: none
+  @spec close_bank(account) :: atom()
   def close_bank(account) do
-    ProcessTransactions.close_account(account)
+    Agent.stop(account)
   end
 
   @doc """
@@ -32,40 +32,22 @@ defmodule BankAccount do
   """
   @spec balance(account) :: integer
   def balance(account) do
-    ProcessTransactions.balance(account)
+    execute_on_account(account, fn account -> Agent.get(account, & &1) end)
   end
 
   @doc """
   Update the account's balance by adding the given amount which may be negative.
   """
-  @spec update(account, integer) :: any
+  @spec update(account, integer) :: atom()
   def update(account, amount) do
-    ProcessTransactions.update_account(account, amount)
-  end
-end
-
-defmodule BankAccount.ProcessTransactions do
-  use GenServer
-
-  def init(state), do: {:ok, state}
-
-  def handle_call(_, _, :closed), do: {:reply, {:error, :account_closed}, :closed}
-
-  def handle_call(:balance, _, balance), do: {:reply, balance, balance}
-
-  def handle_call({:update, amount}, _, balance) do
-    new_balance = balance + amount
-    {:reply, new_balance, new_balance}
+    execute_on_account(account, fn account -> Agent.update(account, &(&1 + amount)) end)
   end
 
-  def handle_cast(:close, _),
-    do: {:noreply, :closed}
-
-  def open_account(0), do: GenServer.start_link(__MODULE__, 0)
-
-  def close_account(account), do: GenServer.cast(account, :close)
-
-  def balance(account), do: GenServer.call(account, :balance)
-
-  def update_account(account, amount), do: GenServer.call(account, {:update, amount})
+  defp execute_on_account(account, fun) do
+    if Process.alive?(account) do
+      fun.(account)
+    else
+      {:error, :account_closed}
+    end
+  end
 end
