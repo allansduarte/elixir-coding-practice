@@ -2,7 +2,7 @@
 I work on exercises from several different sources, incluing:
 
 ## Exercism
-66/94 Elixir fundamentals exercise completed
+70/94 Elixir fundamentals exercise completed
 
 ## Elixir Koans
-44/210 Elixir fundamentals exercise completed
+114/210 Elixir fundamentals exercise completed
