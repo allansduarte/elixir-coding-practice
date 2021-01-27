@@ -6,3 +6,6 @@ I work on exercises from several different sources, incluing:
 
 ## Elixir Koans
 114/210 Elixir fundamentals exercise completed
+
+## Code Signal
+6/60 Arcade Intro
